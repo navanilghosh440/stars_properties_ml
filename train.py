@@ -1,18 +1,15 @@
 import pandas as pd
 import pickle
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
-
 # classification part
-from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 #regression part
-from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
@@ -45,12 +42,12 @@ Xr_train, Xr_test, yr_train, yr_test = train_test_split(X, yr, test_size=0.2, ra
 #making transformers
 t1=ColumnTransformer([
         ('cat', OneHotEncoder(handle_unknown='ignore'), ['Color'])
-    ], remainder='passthrough')
+    ], remainder='passthrough')     #onehotencoder
 
 t2=ColumnTransformer([
     ('num', StandardScaler(), ['Temperature', 'Luminosity', 'Radius']),
     ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), ['Color'])
-])
+])               #standardscaler and onehotencoder 
 
 #pipelines for each classification model
 pipe1=make_pipeline(
@@ -78,6 +75,7 @@ pipe5=make_pipeline(
     t1,
     RandomForestRegressor(random_state=42)
 )
+
 pipe6=make_pipeline(
     t1,
     DecisionTreeRegressor(max_depth=5,min_samples_split=10,min_samples_leaf=4,random_state=42)
@@ -87,6 +85,7 @@ pipe7=make_pipeline(
     t2,
     LinearRegression()
 )
+
 pipe8=make_pipeline(
     t2,
     SVR()
@@ -104,28 +103,18 @@ pipe7.fit(Xr_train, yr_train)
 pipe8.fit(Xr_train, yr_train)
 
 if __name__ == "__main__":
-    #make predictions and evaluate accuracy for classification models
-    predictions1 = pipe1.predict(Xc_test)
-    predictions2 = pipe2.predict(Xc_test)
-    predictions3 = pipe3.predict(Xc_test)
-    predictions4 = pipe4.predict(Xc_test)
-
-    print(f"Random Forest Classification Accuracy: {accuracy_score(yc_test, predictions1) * 100:.2f}%")
-    print(f"Decision Tree Classification Accuracy: {accuracy_score(yc_test, predictions2) * 100:.2f}%")
-    print(f"Logistic Regression Accuracy: {accuracy_score(yc_test, predictions3) * 100:.2f}%")
-    print(f"SVM Accuracy: {accuracy_score(yc_test, predictions4) * 100:.2f}%")
-
-    #make predictions and evaluate accuracy for regression models
-    predictions5 = pipe5.predict(Xr_test)
-    predictions6 = pipe6.predict(Xr_test)
-    predictions7 = pipe7.predict(Xr_test)
-    predictions8 = pipe8.predict(Xr_test)
-
-    print(f"Random Forest MAE: {mean_absolute_error(yr_test, predictions5)}, R2 Score: {r2_score(yr_test, predictions5)}")
-    print(f"Decision Tree MAE: {mean_absolute_error(yr_test, predictions6)}, R2 Score: {r2_score(yr_test, predictions6)}")
-    print(f"Linear Regression MAE: {mean_absolute_error(yr_test, predictions7)}, R2 Score: {r2_score(yr_test, predictions7)}")
-    print(f"SVM MAE: {mean_absolute_error(yr_test, predictions8)}, R2 Score: {r2_score(yr_test, predictions8)}")
-
+    #cross evaluation for classification models
+    print(f"Random Forest Mean Accuracy: {cross_val_score(pipe1, X, yc, cv=5).mean() * 100:.2f}%")
+    print(f"Decision Tree Mean Accuracy: {cross_val_score(pipe2, X, yc, cv=5).mean() * 100:.2f}%")
+    print(f"Logistic Regression Mean Accuracy: {cross_val_score(pipe3, X, yc, cv=5).mean() * 100:.2f}%")
+    print(f"SVM Mean Accuracy: {cross_val_score(pipe4, X, yc, cv=5).mean() * 100:.2f}%")
+    
+    #cross evaluation for regression models
+    print(f"Random Forest Mean R2: {cross_val_score(pipe5, X, yr, cv=5, scoring='r2').mean():.4f}")
+    print(f"Decision Tree Mean R2: {cross_val_score(pipe6, X, yr, cv=5, scoring='r2').mean():.4f}")
+    print(f"Linear Regression Mean R2: {cross_val_score(pipe7, X, yr, cv=5, scoring='r2').mean():.4f}")
+    print(f"SVM Mean R2: {cross_val_score(pipe8, X, yr, cv=5, scoring='r2').mean():.4f}")
+    
     model_bundle = {
         'randomforestclassifier': pipe1,
         'decisiontreeclassifier': pipe2,
