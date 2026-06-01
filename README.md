@@ -5,11 +5,11 @@ An interactive, end-to-end Machine Learning pipeline implemented in Python using
 ---
 
 ## 📊 Project Overview & Core Findings
-This project builds a comparative benchmark between **Tree-Based Models** (Decision Trees, Random Forests) and **Geometric/Linear Models** (Logistic Regression, SVM) using a minimalist preprocessing architecture.
+This project builds a comparative benchmark between **Tree-Based Models** (Decision Trees, Random Forests) and **Geometric/Linear Models** (Logistic Regression, SVM) utilizing a 5-Fold Cross-Validation (`cv=5`) evaluation framework to eliminate data split bias across a 240-star cosmic matrix.
 
 Our terminal test executions yielded a clear distinction in how different mathematical algorithms interact with cosmic physics data:
-* **The Tree Family Dominates:** Random Forests and Decision Trees effortlessly capture the complex, step-based structures of stellar evolution, achieving **~95% accuracy** in classification and explaining **~99% of the variance ($R^2$)** in absolute magnitude.
-* **Linear/Geometric Limits:** Linear models hit a distinct performance wall (~77% classification accuracy / ~66% regression $R^2$). Because absolute magnitude relies on a logarithmic physics curve, forcing a flat, straight line through curved cosmic data causes severe underfitting.
+* **The Tree Family Dominates:** Random Forests and Decision Trees effortlessly capture the complex, multi-scale step thresholds of stellar evolution, achieving a robust **~93-95% Mean CV Accuracy** in classification and maintaining **~0.97-0.98 Mean CV $R^2$ variance** in regression.
+* **Linear/Geometric Limits:** Linear models hit a distinct performance wall, with standard Linear Regression bottoming out at a **0.3725 Mean CV $R^2$ score**. Because absolute magnitude relies on a logarithmic physics curve, forcing a flat, straight line through curved cosmic data causes severe underfitting.
 
 ---
 
@@ -29,7 +29,7 @@ To maximize efficiency and evaluate the models under real-world conditions, the 
 
 ## 📂 Repository Architecture
 * **`6 class csv.csv`**: The master dataset containing raw properties for 240 observed stars.
-* **`train.py` (or `ai.py`)**: The data compilation script. It splits data into un-leaked sets, applies targeted preprocessing transformers, benchmarks 8 separate models, and bundles the trained network weights into a unified, local `star_models.pkl` bundle.
+* **`train.py` (or `ai.py`)**: The data compilation script. It applies targeted preprocessing transformers, executes automated 5-Fold cross-validation evaluations across 8 separate models, and bundles the final trained network weights into a unified, local `star_models.pkl` bundle.
 * **`app.py`**: A lightweight, live Command Line Interface (CLI). It loads the local pickle bundle, takes input from the user's keyboard, normalizes text variations, and generates instantaneous structural predictions.
 
 ---
