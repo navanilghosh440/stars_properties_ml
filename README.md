@@ -46,6 +46,7 @@ By tailoring the input data shape to match what each algorithm family mathematic
 
 ## 📂 Repository Architecture
 * **`6 class csv.csv`**: The master dataset containing physical traits for 240 observed stars.
+* **`skew_analysis.py`**: A Exploratory Data Analysis (EDA) utility. It calculates statistical feature skewness metrics across input dimensions ($X$) and generates automated 1x3 horizontal distribution plots to visually dictate preprocessing paths without console text clutter.
 * **`train.py`**: The central engineering pipeline. Cleans text variations, routes features through parallel `ColumnTransformer` layouts, trains all 8 models simultaneously, evaluates stability via cross-validation, and serializes optimized model pipelines into a local binary file.
 * **`app.py`**: A lightweight, interactive live Command Line Interface (CLI). Loads the serialized model cluster, captures real-time user inputs, validates format inputs, and maps immediate star classifications and brightness predictions.
 
