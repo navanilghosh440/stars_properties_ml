@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -83,6 +84,9 @@ pipe6=make_pipeline(
 
 pipe7=make_pipeline(
     t2,
+    ColumnTransformer([
+    ('log_lum_only', FunctionTransformer(np.log1p, validate=True), [1])
+], remainder='passthrough'),  #functiontransforming luminosity column
     LinearRegression()
 )
 
