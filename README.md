@@ -13,6 +13,14 @@ Our terminal test executions yielded a clear distinction in how different mathem
 
 ---
 
+## 🚀 Changelog & Updates
+
+### 5th June 2026
+* **[Optimized]** Integrated Scikit-Learn `FunctionTransformer` utilizing `np.log1p` nested inside the Linear Regression pipeline. This successfully isolated and linearized the exponential scale of the `Luminosity` feature, breaking through the previous baseline performance wall.
+* **[Fixed]** Resolved a mathematical `ValueError: Input X contains NaN` crash caused by log-transforming zero-value boundaries by implementing a safe $+1$ logarithmic offset.
+
+---
+
 ## 🧬 Algorithm Requirements & Preprocessing Footprint
 
 To maximize efficiency and evaluate the models under real-world conditions, the codebase uses two distinct preprocessing footprints tailored to the absolute minimum requirements of each algorithm:
