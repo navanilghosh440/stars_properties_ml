@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import PowerTransformer, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 # classification part
@@ -46,9 +46,9 @@ t1=ColumnTransformer([
     ], remainder='passthrough')     #onehotencoder
 
 t2=ColumnTransformer([
-    ('num', StandardScaler(), ['Temperature', 'Luminosity', 'Radius']),
+    ('num', PowerTransformer(method='yeo-johnson'), ['Temperature', 'Luminosity', 'Radius']),
     ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), ['Color'])
-])               #standardscaler and onehotencoder 
+])               #power transformer and onehotencoder 
 
 #pipelines for each classification model
 pipe1=make_pipeline(
@@ -84,9 +84,6 @@ pipe6=make_pipeline(
 
 pipe7=make_pipeline(
     t2,
-    ColumnTransformer([
-    ('log_lum_only', FunctionTransformer(np.log1p, validate=True), [1])
-], remainder='passthrough'),  #functiontransforming luminosity column
     LinearRegression()
 )
 
