@@ -1,44 +1,48 @@
-# Star Properties Machine Learning Pipeline & Prediction App
-
-An interactive, end-to-end Machine Learning pipeline implemented in Python using Scikit-Learn. This repository compares multiple classification and regression algorithms to categorize star types and predict their absolute magnitudes based on physical traits, serving as an operational command-line tool for live predictions.
-
----
-
 ## 📊 Project Overview & Core Findings
 This project builds a comparative benchmark between **Tree-Based Models** (Decision Trees, Random Forests) and **Geometric/Linear Models** (Logistic Regression, SVM) utilizing a 5-Fold Cross-Validation (`cv=5`) evaluation framework to eliminate data split bias across a 240-star cosmic matrix.
 
 Our terminal test executions yielded a clear distinction in how different mathematical algorithms interact with cosmic physics data:
-* **The Tree Family Dominates:** Random Forests and Decision Trees effortlessly capture the complex, multi-scale step thresholds of stellar evolution, achieving a robust **~93-95% Mean CV Accuracy** in classification and maintaining **~0.97-0.98 Mean CV $R^2$ variance** in regression.
-* **Linear/Geometric Limits:** Linear models hit a distinct performance wall, with standard Linear Regression bottoming out at a **0.3725 Mean CV $R^2$ score**. Because absolute magnitude relies on a logarithmic physics curve, forcing a flat, straight line through curved cosmic data causes severe underfitting.
-
----
-
-## 🚀 Changelog & Updates
-
-### 5th June 2026
-* **[Optimized]** Integrated Scikit-Learn `FunctionTransformer` utilizing `np.log1p` nested inside the Linear Regression pipeline. This successfully isolated and linearized the exponential scale of the `Luminosity` feature, improving its performance from **0.3725 Mean CV $R^2$ score** to **0.6858 Mean CV $R^2$ score**
-* **[Fixed]** Resolved a mathematical `ValueError: Input X contains NaN` crash caused by log-transforming zero-value boundaries by implementing a safe $+1$ logarithmic offset.
+* **The Tree Family Dominates:** Random Forests and Decision Trees effortlessly capture the complex, multi-scale step thresholds of stellar evolution, achieving an impressive **~92-95% Mean CV Accuracy** in classification and maintaining an ultra-precise **~0.97 Mean CV $R^2$ variance** in regression.
+* **Overcoming Linear Limits via Power Transforming:** Standard linear and distance models initially hit a severe performance wall due to the extreme right-skewed, exponential nature of astronomical data metrics (like Luminosity). By integrating an automated `PowerTransformer(method='yeo-johnson')` directly into the geometric preprocessing pipeline, we successfully mapped skewed feature spreads into symmetrical, Gaussian bell curves—instantly optimizing mapping efficiency.
 
 ---
 
 ## 🧬 Algorithm Requirements & Preprocessing Footprint
 
-To maximize efficiency and evaluate the models under real-world conditions, the codebase uses two distinct preprocessing footprints tailored to the absolute minimum requirements of each algorithm:
+To satisfy the mathematical assumptions of completely different algorithm families, the input data branches into two parallel preprocessor layouts (`t1` and `t2`) before training.
 
-### 1. Tree-Based Models (`RandomForest`, `DecisionTree`)
-* **Requirements:** Categorical encoding (strings to numbers) and full rows (no missing data).
-* **Feature Scaling:** **Not Required.** Trees evaluate variables column-by-column using simple threshold cuts (e.g., `is Radius > 0.17?`). Mixed raw units like a 40,000K Temperature alongside a 0.15 Relative Radius do not disrupt their logic.
+### 1. Tree-Based Sub-Pipeline (`t1`)
+* **Target Models:** `RandomForestClassifier`, `DecisionTreeClassifier`, `RandomForestRegressor`, `DecisionTreeRegressor`
+* **Mathematical Requirement:** These models operate using column-by-column binary threshold splits (e.g., `Luminosity > 500`). They are completely scale-invariant and indifferent to feature distribution shapes or skewness.
+* **Preprocessing Footprint:** * Categorical columns (`Color`) are passed through `OneHotEncoder` to generate discrete binary flags.
+  * Numerical columns are passed straight through via `remainder='passthrough'`. No feature scaling or variance stabilization is applied, keeping execution lightning-fast and preventing unnecessary mathematical overhead.
 
-### 2. Distance/Linear Models (`LogisticRegression`, `LinearRegression`, `SVM/SVR`)
-* **Requirements:** Categorical encoding, complete rows, and structural alignment.
-* **Feature Scaling:** **ABSOLUTELY MANDATORY.** Geometric algorithms calculate spatial coordinate distances or weighted gradients. Because SVR treats data points as positions in space, a feature with massive raw numbers (like Temperature) would completely drown out a feature with small numbers (like Radius). `StandardScaler` is applied here to normalize all dimensions.
+### 2. Geometric & Parametric Sub-Pipeline (`t2`)
+* **Target Models:** `LogisticRegression`, `SVC`, `LinearRegression`, `SVR`
+* **Mathematical Requirement:** These models rely heavily on the statistical assumption of perfectly normal (Gaussian) distributions and continuous linear boundaries. Wildly skewed, exponential scales (spanning multiple orders of magnitude) cause gradient instability and heavily warp geometric distance calculations.
+* **Preprocessing Footprint:**
+  * Categorical columns (`Color`) are handled via `OneHotEncoder(sparse_output=False)` to generate clean numerical arrays compatible with matrix operations.
+  * Numerical columns (`Temperature`, `Luminosity`, `Radius`) are processed using `PowerTransformer(method='yeo-johnson')`. This looks at the data's skewness, calculates the optimal power exponent, shifts the data into a symmetrical bell curve, and automatically handles standard feature scaling to prevent larger features from dominating.
+
+---
+
+## 📈 Preprocessing Performance Metrics
+
+By tailoring the input data shape to match what each algorithm family mathematically expects, we unlocked an immediate performance surge across all linear and distance-based architectures:
+
+| Model Type | Algorithm | Preprocessing Metric (Standard Scaling) | Optimized Metric (Power Transformer) | Performance Shift |
+| :--- | :--- | :--- | :--- | :--- |
+| **Classification** | Logistic Regression | 74.58% CV Accuracy | **86.25% CV Accuracy** | **+11.67% Accuracy Boost** |
+| **Classification** | Support Vector Machine (SVC) | 75.00% CV Accuracy | **83.75% CV Accuracy** | **+8.75% Accuracy Boost** |
+| **Regression** | Linear Regression | 0.6858 CV $R^2$ | **0.9507 CV $R^2$** | **+26.49% Variance Captured** |
+| **Regression** | Support Vector Regressor (SVR) | 0.6983 CV $R^2$ | **0.9389 CV $R^2$** | **+24.06% Variance Captured** |
 
 ---
 
 ## 📂 Repository Architecture
-* **`6 class csv.csv`**: The master dataset containing raw properties for 240 observed stars.
-* **`train.py` (or `ai.py`)**: The data compilation script. It applies targeted preprocessing transformers, executes automated 5-Fold cross-validation evaluations across 8 separate models, and bundles the final trained network weights into a unified, local `star_models.pkl` bundle.
-* **`app.py`**: A lightweight, live Command Line Interface (CLI). It loads the local pickle bundle, takes input from the user's keyboard, normalizes text variations, and generates instantaneous structural predictions.
+* **`6 class csv.csv`**: The master dataset containing physical traits for 240 observed stars.
+* **`train.py`**: The central engineering pipeline. Cleans text variations, routes features through parallel `ColumnTransformer` layouts, trains all 8 models simultaneously, evaluates stability via cross-validation, and serializes optimized model pipelines into a local binary file.
+* **`app.py`**: A lightweight, interactive live Command Line Interface (CLI). Loads the serialized model cluster, captures real-time user inputs, validates format inputs, and maps immediate star classifications and brightness predictions.
 
 ---
 ## 📜 Dataset Credit & Attribution
