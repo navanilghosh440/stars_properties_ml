@@ -36,72 +36,64 @@ yc = df['StarType']
 yr = df['Absolute_Magnitude']
 
 # Split the data into training and testing sets
-Xc_train, Xc_test, yc_train, yc_test = train_test_split(X, yc, test_size=0.2, random_state=42)
-Xr_train, Xr_test, yr_train, yr_test = train_test_split(X, yr, test_size=0.2, random_state=42)
+X_train, X_test, yc_train, yc_test, yr_train, yr_test = train_test_split(
+    X, yc, yr,
+    test_size=0.2,
+    random_state=42
+)
 
 #making transformers
-t1=ColumnTransformer([
-        ('cat', OneHotEncoder(handle_unknown='ignore'), ['Color'])
-    ], remainder='passthrough')     #onehotencoder
+def t1():
+    return ColumnTransformer([('cat', OneHotEncoder(handle_unknown='ignore'), ['Color'])],
+    remainder='passthrough')     #onehotencoder
 
-t2=ColumnTransformer([
+def t2():
+    return ColumnTransformer([
     ('num', PowerTransformer(method='yeo-johnson'), ['Temperature', 'Luminosity', 'Radius']),
     ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), ['Color'])
 ])               #power transformer and onehotencoder 
 
 #pipelines for each classification model
 pipe1=make_pipeline(
-    t1,
+    t1(),
     RandomForestClassifier(random_state=42)
 )
 
 pipe2=make_pipeline(
-    t1,
+    t1(),
     DecisionTreeClassifier(random_state=42)
 )
 
 pipe3=make_pipeline(
-    t2,
+    t2(),
     LogisticRegression(max_iter=1000,random_state=42)
 )
 
 pipe4=make_pipeline(
-    t2,
+    t2(),
     SVC(random_state=42)
 )
 
 #pipelines for each regression model
 pipe5=make_pipeline(
-    t1,
+    t1(),
     RandomForestRegressor(random_state=42)
 )
 
 pipe6=make_pipeline(
-    t1,
+    t1(),
     DecisionTreeRegressor(max_depth=5,min_samples_split=10,min_samples_leaf=4,random_state=42)
 )
 
 pipe7=make_pipeline(
-    t2,
+    t2(),
     LinearRegression()
 )
 
 pipe8=make_pipeline(
-    t2,
+    t2(),
     SVR()
 )
-
-# Fit the models
-pipe1.fit(Xc_train, yc_train)
-pipe2.fit(Xc_train, yc_train)
-pipe3.fit(Xc_train, yc_train)
-pipe4.fit(Xc_train, yc_train)
-
-pipe5.fit(Xr_train, yr_train)
-pipe6.fit(Xr_train, yr_train)
-pipe7.fit(Xr_train, yr_train)
-pipe8.fit(Xr_train, yr_train)
-
 
 #cross evaluation for classification models
 print(f"Random Forest Mean Accuracy: {cross_val_score(pipe1, X, yc, cv=5).mean() * 100:.2f}%")
@@ -114,6 +106,18 @@ print(f"Random Forest Mean R2: {cross_val_score(pipe5, X, yr, cv=5, scoring='r2'
 print(f"Decision Tree Mean R2: {cross_val_score(pipe6, X, yr, cv=5, scoring='r2').mean():.4f}")
 print(f"Linear Regression Mean R2: {cross_val_score(pipe7, X, yr, cv=5, scoring='r2').mean():.4f}")
 print(f"SVM Mean R2: {cross_val_score(pipe8, X, yr, cv=5, scoring='r2').mean():.4f}")
+
+# Fit the models
+pipe1.fit(X_train, yc_train)
+pipe2.fit(X_train, yc_train)
+pipe3.fit(X_train, yc_train)
+pipe4.fit(X_train, yc_train)
+
+pipe5.fit(X_train, yr_train)
+pipe6.fit(X_train, yr_train)
+pipe7.fit(X_train, yr_train)
+pipe8.fit(X_train, yr_train)
+
 
 model_bundle = {
     'randomforestclassifier': pipe1,
