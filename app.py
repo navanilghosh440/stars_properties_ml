@@ -44,5 +44,3 @@ try:
             continue
 except FileNotFoundError:
     print("Model file not found. Please run the training script to create the model file before using this program.")
-
-'t=3068,l=0.0024,r=0.17,a=16.12,st=0,c=Red,s=M'
