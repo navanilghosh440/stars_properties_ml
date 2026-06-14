@@ -102,32 +102,32 @@ pipe6.fit(Xr_train, yr_train)
 pipe7.fit(Xr_train, yr_train)
 pipe8.fit(Xr_train, yr_train)
 
-if __name__ == "__main__":
-    #cross evaluation for classification models
-    print(f"Random Forest Mean Accuracy: {cross_val_score(pipe1, X, yc, cv=5).mean() * 100:.2f}%")
-    print(f"Decision Tree Mean Accuracy: {cross_val_score(pipe2, X, yc, cv=5).mean() * 100:.2f}%")
-    print(f"Logistic Regression Mean Accuracy: {cross_val_score(pipe3, X, yc, cv=5).mean() * 100:.2f}%")
-    print(f"SVM Mean Accuracy: {cross_val_score(pipe4, X, yc, cv=5).mean() * 100:.2f}%")
+
+#cross evaluation for classification models
+print(f"Random Forest Mean Accuracy: {cross_val_score(pipe1, X, yc, cv=5).mean() * 100:.2f}%")
+print(f"Decision Tree Mean Accuracy: {cross_val_score(pipe2, X, yc, cv=5).mean() * 100:.2f}%")
+print(f"Logistic Regression Mean Accuracy: {cross_val_score(pipe3, X, yc, cv=5).mean() * 100:.2f}%")
+print(f"SVM Mean Accuracy: {cross_val_score(pipe4, X, yc, cv=5).mean() * 100:.2f}%")
+
+#cross evaluation for regression models
+print(f"Random Forest Mean R2: {cross_val_score(pipe5, X, yr, cv=5, scoring='r2').mean():.4f}")
+print(f"Decision Tree Mean R2: {cross_val_score(pipe6, X, yr, cv=5, scoring='r2').mean():.4f}")
+print(f"Linear Regression Mean R2: {cross_val_score(pipe7, X, yr, cv=5, scoring='r2').mean():.4f}")
+print(f"SVM Mean R2: {cross_val_score(pipe8, X, yr, cv=5, scoring='r2').mean():.4f}")
+
+model_bundle = {
+    'randomforestclassifier': pipe1,
+    'decisiontreeclassifier': pipe2,
+    'logisticregression': pipe3,
+    'svm': pipe4,   
+    'randomforestregressor': pipe5,
+    'decisiontreeregressor': pipe6,
+    'linearregression': pipe7,
+    'svr': pipe8
+}
+
+# Save the bundle dictionary into one file using Write Binary ('wb') mode
+with open('star_models.pkl', 'wb') as f:
+    pickle.dump(model_bundle, f)
     
-    #cross evaluation for regression models
-    print(f"Random Forest Mean R2: {cross_val_score(pipe5, X, yr, cv=5, scoring='r2').mean():.4f}")
-    print(f"Decision Tree Mean R2: {cross_val_score(pipe6, X, yr, cv=5, scoring='r2').mean():.4f}")
-    print(f"Linear Regression Mean R2: {cross_val_score(pipe7, X, yr, cv=5, scoring='r2').mean():.4f}")
-    print(f"SVM Mean R2: {cross_val_score(pipe8, X, yr, cv=5, scoring='r2').mean():.4f}")
-    
-    model_bundle = {
-        'randomforestclassifier': pipe1,
-        'decisiontreeclassifier': pipe2,
-        'logisticregression': pipe3,
-        'svm': pipe4,   
-        'randomforestregressor': pipe5,
-        'decisiontreeregressor': pipe6,
-        'linearregression': pipe7,
-        'svr': pipe8
-    }
-    
-    # Save the bundle dictionary into one file using Write Binary ('wb') mode
-    with open('star_models.pkl', 'wb') as f:
-        pickle.dump(model_bundle, f)
-        
-    print("Success! 'star_models.pkl' has been created in your workspace.")
+print("Success! 'star_models.pkl' has been created in your workspace.")
