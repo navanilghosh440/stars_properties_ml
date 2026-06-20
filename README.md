@@ -23,12 +23,14 @@ To satisfy the mathematical assumptions of completely different algorithm famili
 * **Preprocessing Footprint:**
   * Categorical columns (`Color`) are handled via `OneHotEncoder(sparse_output=False)` to generate clean numerical arrays compatible with matrix operations.
   * Numerical columns (`Temperature`, `Luminosity`, `Radius`) are processed using `PowerTransformer(method='yeo-johnson')`. This looks at the data's skewness, calculates the optimal power exponent, shifts the data into a symmetrical bell curve, and automatically handles standard feature scaling to prevent larger features from dominating.
+ 
 ### 🧠 Architectural Choice: Why PowerTransformer instead of StandardScaler?
 While `StandardScaler` is the standard default for feature scaling, it was intentionally rejected for the geometric pipeline in favor of `PowerTransformer` due to the physics of astronomical data:
 
 * **StandardScaler Preserves the Flaws:** Standard scaling only alters the *unit scale* (forcing a mean of 0 and standard deviation of 1), but it leaves the underlying distribution completely unchanged. Because cosmic features like `Luminosity` span 9 orders of magnitude ($0.0001$ to $500,000$), the data is heavily right-skewed. Under standard scaling, 90% of the stars remain tightly crushed near zero while a few Hypergiants remain massive geometric outliers, warping the model's spatial grid.
 * **PowerTransformer Rewrites the Geometry:** The Yeo-Johnson power transform calculates a custom mathematical exponent for each feature to stabilize variance and physically reshape the distribution. It pulls the tightly packed dwarf stars apart and pulls the extreme hypergiant outliers closer to the center—actively bending the skewed data into a symmetrical, Gaussian bell curve. 
 * **The Result:** The `PowerTransformer` automatically handles feature scaling while simultaneously satisfying the strict normality assumptions of linear and distance-based models. This structural data correction un-bent the mathematical relationships, instantly boosting Linear Regression variance capture ($R^2$) from `0.6858` to `0.9507`.
+* **Maximizing Training Data Volume:** Because 5-Fold Cross-Validation dynamically splits, evaluates, and isolates our data slices entirely under the hood to calculate honest performance metrics, an explicit `train_test_split` became structurally redundant. Removing it allowed us to safely feed 100% of the dataset's physical variance into our final production model weights—ensuring the live CLI application handles user inference with maximum predictive power.
 ---
 
 ## 📈 Preprocessing Performance Metrics
