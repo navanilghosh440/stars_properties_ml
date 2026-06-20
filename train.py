@@ -1,6 +1,6 @@
 import pandas as pd
 import pickle
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import PowerTransformer, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
@@ -34,13 +34,6 @@ df['Color'] = df['Color'].str.split().str.join('-')
 X = df[['Temperature', 'Luminosity', 'Radius', 'Color']]
 yc = df['StarType']
 yr = df['Absolute_Magnitude']
-
-# Split the data into training and testing sets
-X_train, X_test, yc_train, yc_test, yr_train, yr_test = train_test_split(
-    X, yc, yr,
-    test_size=0.2,
-    random_state=42
-)
 
 #making transformers
 def t1():
@@ -108,15 +101,15 @@ print(f"Linear Regression Mean R2: {cross_val_score(pipe7, X, yr, cv=5, scoring=
 print(f"SVM Mean R2: {cross_val_score(pipe8, X, yr, cv=5, scoring='r2').mean():.4f}")
 
 # Fit the models
-pipe1.fit(X_train, yc_train)
-pipe2.fit(X_train, yc_train)
-pipe3.fit(X_train, yc_train)
-pipe4.fit(X_train, yc_train)
+pipe1.fit(X, yc)
+pipe2.fit(X, yc)
+pipe3.fit(X, yc)
+pipe4.fit(X, yc)
 
-pipe5.fit(X_train, yr_train)
-pipe6.fit(X_train, yr_train)
-pipe7.fit(X_train, yr_train)
-pipe8.fit(X_train, yr_train)
+pipe5.fit(X, yr)
+pipe6.fit(X, yr)
+pipe7.fit(X, yr)
+pipe8.fit(X, yr)
 
 
 model_bundle = {
