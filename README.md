@@ -4,7 +4,8 @@ This project builds a comparative benchmark between **Tree-Based Models** (Decis
 Our terminal test executions yielded a clear distinction in how different mathematical algorithms interact with cosmic physics data:
 * **The Tree Family Dominates:** Random Forests and Decision Trees effortlessly capture the complex, multi-scale step thresholds of stellar evolution, achieving an impressive **~92-95% Mean CV Accuracy** in classification and maintaining an ultra-precise **~0.97 Mean CV $R^2$ variance** in regression.
 * **Overcoming Linear Limits via Power Transforming:** Standard linear and distance models initially hit a severe performance wall due to the extreme right-skewed, exponential nature of astronomical data metrics (like Luminosity). By integrating an automated `PowerTransformer(method='yeo-johnson')` directly into the geometric preprocessing pipeline, we successfully mapped skewed feature spreads into symmetrical, Gaussian bell curves—instantly optimizing mapping efficiency.
-
+* **Instance Confidence over Generic Metrics:** To eliminate the vagueness of static model expectations for the end user, the live interface dynamically calculates and outputs **real-time prediction confidence percentages** for classifications, explicitly mapping boundary ambiguity for transitionary star states.
+  
 ---
 
 ## 🧬 Algorithm Requirements & Preprocessing Footprint
