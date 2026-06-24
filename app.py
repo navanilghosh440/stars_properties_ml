@@ -33,7 +33,11 @@ try:
             result = model.predict(df)
             if model_choice in ['randomforestclassifier', 'decisiontreeclassifier', 'logisticregression', 'svm']:
                 star_types = {0: 'Brown Dwarf', 1: 'Red Dwarf', 2: 'White Dwarf', 3: 'Main Sequence', 4: 'Supergiant', 5: 'Hypergiant'}
-                print(f"Predicted Star Type: {star_types[result[0]]}")
+              
+                probabilities = model.predict_proba(df)[0]
+                confidence = probabilities[result[0]]*100                
+                print(f"Predicted Star Type: {star_types[result[0]]} ({confidence:.1f}% Confidence)")
+           
             else:
                 print(f"Predicted Absolute Magnitude: {result[0]}")
         elif model_choice.lower() == 'exit':
