@@ -64,7 +64,7 @@ pipe3=make_pipeline(
 
 pipe4=make_pipeline(
     t2(),
-    SVC(random_state=42)
+    SVC(probability=True,random_state=42)
 )
 
 #pipelines for each regression model
